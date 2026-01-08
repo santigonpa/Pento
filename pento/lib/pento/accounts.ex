@@ -5,6 +5,7 @@ defmodule Pento.Accounts do
 
   import Ecto.Query, warn: false
   alias Pento.Repo
+  alias Pento.Accounts.UserNotifier
 
   alias Pento.Accounts.{User, UserToken, UserNotifier}
 
@@ -75,9 +76,16 @@ defmodule Pento.Accounts do
 
   """
   def register_user(attrs) do
-    %User{}
-    |> User.registration_changeset(attrs)
-    |> Repo.insert()
+    case %User{}
+         |> User.registration_changeset(attrs)
+         |> Repo.insert() do
+      {:ok, user} ->
+        UserNotifier.deliver_welcome_email(user)
+        {:ok, user}
+
+      {:error, changeset} ->
+        {:error, changeset}
+    end
   end
 
   @doc """

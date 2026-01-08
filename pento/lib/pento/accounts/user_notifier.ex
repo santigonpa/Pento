@@ -37,6 +37,19 @@ defmodule Pento.Accounts.UserNotifier do
     """)
   end
 
+  def deliver_welcome_email(user) do
+    deliver(user.email, "Welcome to Pento!", """
+
+    ==============================
+
+    Hi #{user.email},
+
+    Thanks for joining the Pento community!
+
+    ==============================
+    """)
+  end
+
   @doc """
   Deliver instructions to reset a user password.
   """
