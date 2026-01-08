@@ -145,6 +145,11 @@ defmodule PentoWeb.UserAuth do
         live "/profile", ProfileLive, :index
       end
   """
+  def on_mount(:session_id, _params, session, socket) do
+    {:cont,
+     Phoenix.Component.assign_new(socket, :session_id, fn -> session["live_socket_id"] end)}
+  end
+
   def on_mount(:mount_current_user, _params, session, socket) do
     {:cont, mount_current_user(socket, session)}
   end
