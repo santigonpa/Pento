@@ -8,6 +8,12 @@ defmodule Pento.Catalog do
 
   alias Pento.Catalog.Product
 
+  def markdown_product(product, amount) do
+    product
+    |> Product.change_unit_price_changeset(%{unit_price: product.unit_price - amount})
+    |> Repo.update()
+  end
+
   @doc """
   Returns the list of products.
 
