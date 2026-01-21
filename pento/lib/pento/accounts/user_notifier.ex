@@ -50,6 +50,19 @@ defmodule Pento.Accounts.UserNotifier do
     """)
   end
 
+  def deliver_promotion(invited_user) do
+    deliver(invited_user.email, "Join the Pento Community!", """
+
+    ==============================
+
+    Hi #{invited_user.first_name},
+
+    You have 10% off your first purchase!
+
+    ==============================
+    """)
+  end
+
   @doc """
   Deliver instructions to reset a user password.
   """

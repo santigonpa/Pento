@@ -51,7 +51,7 @@ defmodule PentoWeb.PromoLive do
       ) do
     # :timer.sleep(1000)
 
-    case Promo.sent_promo(recipient, recipient_params) do
+    case Promo.send_promo(recipient, recipient_params) do
       {:ok, _recipient} ->
         {:noreply,
          socket
