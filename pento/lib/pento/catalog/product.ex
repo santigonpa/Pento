@@ -25,6 +25,6 @@ defmodule Pento.Catalog.Product do
     product
     |> cast(attrs, [:unit_price])
     |> validate_required([:unit_price])
-    |> validate_number(:unit_price, less_than: product.unit_price)
+    |> validate_number(:unit_price, less_than: product.unit_price, greater_than: 0.0)
   end
 end
