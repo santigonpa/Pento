@@ -27,6 +27,11 @@ defmodule Pento.Catalog do
     Repo.all(Product)
   end
 
+  def get_products_by_string_sku(sku) do
+    query = from(p in Product, where: p.sku == ^String.to_integer(sku))
+    Repo.all(query)
+  end
+
   @doc """
   Gets a single product.
 
