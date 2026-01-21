@@ -43,6 +43,10 @@ defmodule PentoWeb.ProductLive.FormComponent do
         <% end %>
         <progress value={image.progress} max="100" />
       <% end %>
+
+      <%= for entry <- @uploads.image.entries do %>
+        <.button phx-click="cancel-upload" phx-target={@myself} phx-value-ref={entry.ref}>Cancel</.button>
+      <% end %>
     </div>
     """
   end
@@ -69,6 +73,10 @@ defmodule PentoWeb.ProductLive.FormComponent do
 
   def handle_event("save", %{"product" => product_params}, socket) do
     save_product(socket, socket.assigns.action, product_params)
+  end
+
+  def handle_event("cancel-upload", %{"ref" => ref}, socket) do
+    {:noreply, cancel_upload(socket, :image, ref)}
   end
 
   defp save_product(socket, :edit, params) do
