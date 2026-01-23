@@ -32,6 +32,11 @@ defmodule Pento.Catalog do
     Repo.all(query)
   end
 
+  def list_products_with_user_rating(user) do
+    Product.Query.with_user_ratings(user)
+    |> Repo.all()
+  end
+
   @doc """
   Gets a single product.
 
