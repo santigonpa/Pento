@@ -455,6 +455,9 @@ defmodule PentoWeb.CoreComponents do
   attr :rows, :list, required: true
   attr :row_id, :any, default: nil, doc: "the function for generating the row id"
   attr :row_click, :any, default: nil, doc: "the function for handling phx-click on each row"
+  attr :first_column_style, :string,
+    default: "font-semibold text-zinc-900",
+    doc: "the class for styling the first column"
 
   attr :row_item, :any,
     default: &Function.identity/1,
@@ -496,7 +499,7 @@ defmodule PentoWeb.CoreComponents do
             >
               <div class="block py-4 pr-6">
                 <span class="absolute -inset-y-px right-0 -left-4 group-hover:bg-zinc-50 sm:rounded-l-xl" />
-                <span class={["relative", i == 0 && "font-semibold text-zinc-900"]}>
+                <span class={["relative", i == 0 && @first_column_style]}>
                   {render_slot(col, @row_item.(row))}
                 </span>
               </div>

@@ -11,6 +11,7 @@
   id="products"
   rows={@streams.products}
   row_click={fn {_id, product} -> JS.navigate(~p"/products/#{product}") end}
+  first_column_style="italic font-medium text-blue-900"
 >
   <:col :let={{_id, product}} label="Name">{product.name}</:col>
   <:col :let={{_id, product}} label="Description">{product.description}</:col>
