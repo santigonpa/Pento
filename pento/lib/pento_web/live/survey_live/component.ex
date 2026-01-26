@@ -7,7 +7,7 @@ defmodule PentoWeb.SurveyLive.Component do
   def hero(assigns) do
     ~H"""
     <h1 class="font-heavy text-3xl">
-      <%= @content %>
+      <%!-- <%= @content %> --%>
     </h1>
     <h3>
       <%= render_slot(@inner_block) %>
