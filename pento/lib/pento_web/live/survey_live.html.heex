@@ -1,6 +1,15 @@
 <Component.title title="Survey Section" message="Remember to complete all fields." />
 
-<.live_component module={PentoWeb.ToggleComponentLive} id="toggle-example">
+<%!-- JS Commands allow to implement the “show/hide” functionality without round-tripping to the server. --%>
+<div class="mb-4">
+  <.button phx-click={JS.toggle(to: "#survey-section")}>
+    Toggle Survey Section
+  </.button>
+</div>
+
+<%!-- The commented approach uses a live component that uses an unnecessary round-trip to the server --%>
+<%!-- <.live_component module={PentoWeb.ToggleComponentLive} id="toggle-example"> --%>
+<div id="survey-section" class="hidden">
   <Component.hero content={"Survey"} >
     <%= if @demographic do %>
       <DemographicLive.Show.details demographic={@demographic} />
@@ -15,6 +24,7 @@
         current_user={@current_user} />
     <% end %>
   </Component.hero>
-</.live_component>
+</div>
+<%!-- </.live_component> --%>
 
 <%!-- <Component.list items={["Item 1", "Item 2", "Item 3"]} /> --%>
