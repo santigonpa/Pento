@@ -1,11 +1,17 @@
 <Component.title title="Survey Section" message="Remember to complete all fields." />
 
 <Component.hero content={"Survey"} >
-  Please fill out our survey
   <%= if @demographic do %>
     <DemographicLive.Show.details demographic={@demographic} />
+    <hr />
+    <br/>
+    <RatingLive.Index.product_list products={@products}
+      current_user={@current_user} />
   <% else %>
-    <h2>Demographic Form coming soon!</h2>
+    Please fill out our survey
+    <.live_component module={DemographicLive.Form}
+      id="demographic-form"
+      current_user={@current_user} />
   <% end %>
 </Component.hero>
 
