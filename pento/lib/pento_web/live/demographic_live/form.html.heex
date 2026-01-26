@@ -1,7 +1,6 @@
 <div>
   <.simple_form
     for={@form}
-    phx-change="validate"
     phx-submit="save"
     id={@id}
     phx-target={@myself}>
@@ -15,6 +14,11 @@
       type="select"
       label="Year of Birth"
       options={Enum.reverse(1920..2026)} />
+    <.input
+      field={@form[:education_level]}
+      type="select"
+      label="Education Level"
+      options={["high school","bachelor's degree", "graduate degree", "other", "prefer not to say"]} />
     <:actions>
       <.button phx-disable-with="Saving...">Save</.button>
     </:actions>
