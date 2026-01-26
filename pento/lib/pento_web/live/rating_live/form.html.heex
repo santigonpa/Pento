@@ -2,6 +2,7 @@
   <.form
     for={@form}
     phx-submit="save"
+    phx-change="validate"
     phx-target={@myself}
     id={@id}>
     <.input field={@form[:user_id]} type="hidden" />
