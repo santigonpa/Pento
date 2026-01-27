@@ -59,7 +59,9 @@ defmodule Pento.MixProject do
       {:gettext, "~> 0.26"},
       {:jason, "~> 1.2"},
       {:dns_cluster, "~> 0.1.1"},
-      {:bandit, "~> 1.5"}
+      {:bandit, "~> 1.5"},
+      {:plug_cowboy, "~> 2.5"},
+      {:contex, "~> 0.4.0"}
     ]
   end
 
