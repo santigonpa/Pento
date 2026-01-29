@@ -4,6 +4,7 @@ defmodule PentoWeb.Presence do
     pubsub_server: Pento.PubSub
 
   @user_activity_topic "user_activity"
+  @survey_activity_topic "survey_activity"
 
   def track_user(pid, product, user_email) do
     track(
@@ -12,6 +13,25 @@ defmodule PentoWeb.Presence do
       product.name,
       %{users: [%{email: user_email}]}
     )
+  end
+
+  # automatically triggers presence diff event
+  def track_survey_user(pid, user_email) do
+    track(
+      pid,
+      @survey_activity_topic,
+      "survey",
+      %{users: [%{email: user_email}]}
+    )
+  end
+
+  def list_survey_users do
+    list(@survey_activity_topic)
+    |> Enum.map(&extract_survey_users/1)
+  end
+
+  defp extract_survey_users({_key, %{metas: metas}}) do
+    users_from_metas_list(metas)
   end
 
   def list_products_and_users do

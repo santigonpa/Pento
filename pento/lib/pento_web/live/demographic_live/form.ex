@@ -3,15 +3,25 @@ defmodule PentoWeb.DemographicLive.Form do
 
   alias Pento.Survey
   alias Pento.Survey.Demographic
+  alias PentoWeb.Presence
 
   def update(assigns, socket) do
+    socket = assign(socket, assigns)
+
+    maybe_track_user(socket)
+
     {
       :ok,
       socket
-      |> assign(assigns)
       |> assign_demographic()
       |> clear_form()
     }
+  end
+
+  defp maybe_track_user(%{assigns: %{current_user: current_user}} = socket) do
+    if connected?(socket) do
+      Presence.track_survey_user(self(), current_user.email)
+    end
   end
 
   defp assign_demographic(%{assigns: %{current_user: current_user}} = socket) do
