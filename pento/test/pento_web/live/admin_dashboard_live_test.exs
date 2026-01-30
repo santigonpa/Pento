@@ -98,7 +98,7 @@ defmodule PentoWeb.AdminDashboardLiveTest do
              |> render_change(params) =~ "<title>2.00</title>"
     end
 
-    test "it updates to isplay newly created ratings",
+    test "it updates to display newly created ratings",
          %{conn: conn, product: product} do
       {:ok, view, html} = live(conn, "/admin/dashboard")
       assert html =~ "<title>2.50</title>"
