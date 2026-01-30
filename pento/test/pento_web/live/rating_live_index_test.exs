@@ -25,6 +25,17 @@ defmodule PentoWeb.RatingLiveIndexTest do
     user
   end
 
+  defp rating_fixture(user, product, stars) do
+    {:ok, rating} =
+      Survey.create_rating(%{
+        stars: stars,
+        user_id: user.id,
+        product_id: product.id
+      })
+
+    rating
+  end
+
   defp create_product(_) do
     product = product_fixture()
     %{product: product}
@@ -33,6 +44,11 @@ defmodule PentoWeb.RatingLiveIndexTest do
   defp create_user(_) do
     user = user_fixture()
     %{user: user}
+  end
+
+  defp create_rating(user, product, stars) do
+    rating = rating_fixture(user, product, stars)
+    %{rating: rating}
   end
 
   describe "Index" do
@@ -54,6 +70,25 @@ defmodule PentoWeb.RatingLiveIndexTest do
 
       # assert it includes the rating form since no ratings exist
       assert rendered =~ "rating-form-#{product.id}"
+    end
+
+    test "renders the correct rating details when ratings do exist",
+         %{user: user, product: product} do
+      # create a rating for the user and product
+      %{rating: rating} = create_rating(user, product, 2)
+      product = %{product | ratings: [rating]}
+
+      rendered =
+        render_component(&Index.product_list/1, %{
+          products: [product],
+          current_user: user
+        })
+
+      # 2 filled stars and 3 unfilled stars
+      assert rendered =~ "&#x2605; &#x2605; &#x2606; &#x2606; &#x2606;"
+
+      # ensure the rating form is not rendered
+      refute rendered =~ "rating-form-#{product.id}"
     end
   end
 end
