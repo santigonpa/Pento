@@ -7,7 +7,7 @@ defmodule Pento.Game.Board do
             points: []
 
   def puzzles() do
-    ~w[default wide widest medium tiny]a
+    ~w[default wide widest medium tiny skewed_rectangle]a
   end
 
   def new(palette, points) do
@@ -19,9 +19,14 @@ defmodule Pento.Game.Board do
   def new(:wide), do: new(:all, rect(15, 4))
   def new(:medium), do: new(:all, rect(12, 5))
   def new(:default), do: new(:all, rect(10, 6))
+  def new(:skewed_rectangle), do: new(:all, skewed_rect(12, 5))
 
   defp rect(x, y) do
     for x <- 1..x, y <- 1..y, do: {x, y}
+  end
+
+  defp skewed_rect(w, h) do
+    for i <- 1..w, j <- 1..h, do: {i + (h - j), j}
   end
 
   defp palette(:all), do: [:i, :l, :y, :n, :p, :w, :u, :v, :s, :f, :x, :t]
