@@ -36,6 +36,8 @@ defmodule PentoWeb.CoreComponents do
       </.modal>
 
   """
+  
+
   attr :id, :string, required: true
   attr :show, :boolean, default: false
   attr :on_cancel, JS, default: %JS{}

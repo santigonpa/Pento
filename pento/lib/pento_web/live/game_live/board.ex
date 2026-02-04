@@ -1,7 +1,8 @@
 defmodule PentoWeb.GameLive.Board do
   use PentoWeb, :live_component
 
-  alias Pento.Game.{Board, Pentomino, Colors}
+  alias Pento.Game
+  alias Pento.Game.Board
 
   import PentoWeb.GameLive.{Colors, Component}
 
@@ -18,22 +19,10 @@ defmodule PentoWeb.GameLive.Board do
   end
 
   def assign_board(%{assigns: %{puzzle: puzzle}} = socket) do
-    active = Pentomino.new(name: :p, location: {7, 2})
-
-    completed = [
-      Pentomino.new(name: :u, rotation: 270, location: {1, 2}),
-      Pentomino.new(name: :v, rotation: 90, location: {4, 2})
-      # Pentomino.new(name: :p, rotation: 90, reflected: true, location: {3, 2}) // winning position
-    ]
-
-    _puzzles = Board.puzzles()
-
     board =
       puzzle
       |> String.to_existing_atom()
       |> Board.new()
-      |> Map.put(:completed_pentos, completed)
-      |> Map.put(:active_pento, active)
 
     assign(socket, board: board)
   end
@@ -44,10 +33,63 @@ defmodule PentoWeb.GameLive.Board do
     assign(socket, shapes: shapes)
   end
 
+  def handle_event("pick", %{"name" => name}, socket) do
+    {:noreply, socket |> pick(name) |> assign_shapes}
+  end
+
+  def handle_event("key", %{"key" => key}, socket) do
+    {:noreply, socket |> do_key(key) |> assign_shapes}
+  end
+
+  def do_key(socket, key) do
+    case key do
+      " " -> drop(socket)
+      "ArrowLeft" -> move(socket, :left)
+      "ArrowRight" -> move(socket, :right)
+      "ArrowUp" -> move(socket, :up)
+      "ArrowDown" -> move(socket, :down)
+      "Shift" -> move(socket, :rotate)
+      "Enter" -> move(socket, :flip)
+      "Space" -> drop(socket)
+      _ -> socket
+    end
+  end
+
+  def move(socket, move) do
+    case Game.maybe_move(socket.assigns.board, move) do
+      {:error, message} ->
+        IO.inspect("Move error: #{message}")
+
+        socket
+        |> put_flash(:info, message)
+
+      {:ok, board} ->
+        socket |> assign(board: board) |> assign_shapes
+    end
+  end
+
+  defp drop(socket) do
+    case Game.maybe_drop(socket.assigns.board) do
+      {:error, message} ->
+        IO.inspect("Move error: #{message}")
+
+        socket
+        |> put_flash(:info, "message")
+
+      {:ok, board} ->
+        socket |> assign(board: board) |> assign_shapes
+    end
+  end
+
+  defp pick(socket, name) do
+    shape_name = String.to_existing_atom(name)
+    update(socket, :board, &Board.pick(&1, shape_name))
+  end
+
   def render(assigns) do
     ~H"""
     <div id={ @id } phx-window-keydown="key" phx-target={ @myself }>
-      <.canvas view_box="0 0 200 70">
+      <.canvas view_box="0 0 200 140">
         <%= for shape <- @shapes do %>
           <.shape
             points={ shape.points }
