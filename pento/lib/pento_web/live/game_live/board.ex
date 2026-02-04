@@ -61,6 +61,14 @@ defmodule PentoWeb.GameLive.Board do
         shape_names={@board.palette}
         completed_shape_names= {Enum.map(@board.completed_pentos, & &1.name)}
       />
+      <hr/>
+      <p>Control Panel</p>
+      <.control_panel view_box="0 0 200 40">
+        <.triangle x={100} y={9} rotate={0} fill="lightsteelblue" />
+        <.triangle x={90} y={20} rotate={270} fill="lightsteelblue" />
+        <.triangle x={110} y={20} rotate={90} fill="lightsteelblue" />
+        <.triangle x={100} y={31} rotate={180} fill="lightsteelblue" />
+      </.control_panel>
     </div>
     """
   end
