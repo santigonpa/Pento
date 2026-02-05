@@ -10,7 +10,8 @@ defmodule PentoWeb.GameLive.Board do
      socket
      |> assign_params(id, puzzle)
      |> assign_board()
-     |> assign_shapes()}
+     |> assign_shapes()
+     |> assign_score()}
   end
 
   def assign_params(socket, id, puzzle) do
@@ -32,12 +33,45 @@ defmodule PentoWeb.GameLive.Board do
     assign(socket, shapes: shapes)
   end
 
+  def assign_score(socket) do
+    socket
+    |> assign(score: 0)
+    |> assign(penalty: 0)
+  end
+
+  defp update_score(socket) do
+    score = Game.Board.calculate_score(socket.assigns.board)
+    penalty = socket.assigns.penalty
+
+    assign(socket, score: score + penalty)
+  end
+
+  defp penalty_score(socket) do
+    actual_penalty = socket.assigns.penalty
+
+    socket
+    |> assign(penalty: actual_penalty - 1)
+    |> update_score()
+  end
+
   def handle_event("pick", %{"name" => name}, socket) do
     {:noreply, socket |> pick(name) |> assign_shapes}
   end
 
   def handle_event("key", %{"key" => key}, socket) do
     {:noreply, socket |> do_key(key) |> assign_shapes}
+  end
+
+  def handle_event("give_up", _params, socket) do
+    send(self(), {:flash, :error, "You gave up! Try again."})
+
+    socket =
+      socket
+      |> assign_board()
+      |> assign_shapes()
+      |> assign_score()
+
+    {:noreply, socket}
   end
 
   def do_key(socket, key) do
@@ -57,37 +91,44 @@ defmodule PentoWeb.GameLive.Board do
   def move(socket, move) do
     case Game.maybe_move(socket.assigns.board, move) do
       {:error, message} ->
-        IO.inspect("Move error: #{message}")
+        send(self(), {:flash, :error, message})
 
         socket
-        |> put_flash(:info, message)
 
       {:ok, board} ->
-        socket |> assign(board: board) |> assign_shapes
+        socket |> assign(board: board) |> assign_shapes |> penalty_score()
     end
   end
 
   defp drop(socket) do
     case Game.maybe_drop(socket.assigns.board) do
       {:error, message} ->
-        IO.inspect("Move error: #{message}")
+        send(self(), {:flash, :error, message})
 
         socket
-        |> put_flash(:info, "message")
 
       {:ok, board} ->
-        socket |> assign(board: board) |> assign_shapes
+        if Game.Board.finished?(board) do
+          send(self(), :redirect)
+        end
+
+        socket |> assign(board: board) |> assign_shapes |> update_score()
     end
   end
 
   defp pick(socket, name) do
     shape_name = String.to_existing_atom(name)
-    update(socket, :board, &Game.Board.pick(&1, shape_name))
+    active_pento = socket.assigns.board.active_pento
+
+    socket
+    |> update(:board, &Game.Board.pick(&1, shape_name))
+    |> update_score()
   end
 
   def render(assigns) do
     ~H"""
     <div id={ @id } phx-window-keydown="key" phx-target={ @myself }>
+      <h3>Score: <%= @score %></h3>
       <.canvas view_box="0 0 200 140">
         <%= for shape <- @shapes do %>
           <.shape
@@ -98,12 +139,13 @@ defmodule PentoWeb.GameLive.Board do
         <% end %>
       </.canvas>
       <hr/>
+      <.button class="m-5" phx-click="give_up" phx-target={ @myself }>Give Up</.button>
       <.palette
         shape_names={@board.palette}
         completed_shape_names= {Enum.map(@board.completed_pentos, & &1.name)}
       />
       <hr/>
-      <p>Control Panel</p>
+      <h3>Control Panel</h3>
       <.control_panel view_box="0 0 200 40">
         <.triangle x={100} y={9} rotate={0} fill="lightsteelblue" />
         <.triangle x={90} y={20} rotate={270} fill="lightsteelblue" />

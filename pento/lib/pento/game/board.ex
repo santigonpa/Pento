@@ -121,4 +121,17 @@ defmodule Pento.Game.Board do
   def legal_move?(%{active_pento: pento, points: points} = _board) do
     pento.location in points
   end
+
+  def finished?(%{points: points, completed_pentos: pentos}) do
+    completed_points =
+      pentos
+      |> Enum.map(&Pentomino.to_shape/1)
+      |> Enum.flat_map(& &1.points)
+
+      points -- completed_points == []
+  end
+
+  def calculate_score(%{completed_pentos: pentos}) do
+    Enum.count(pentos) * 500
+  end
 end

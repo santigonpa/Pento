@@ -15,7 +15,7 @@ defmodule PentoWeb.GameLive do
     <section class="container">
       <div class="grid grid-cols-2">
         <div>
-          <h1 class="font-heavy text-3xl text-center">
+          <h1 class="font-heavy text-3xl">
             Welcome to Pento!
           </h1>
         </div>
@@ -24,6 +24,16 @@ defmodule PentoWeb.GameLive do
       <.live_component module={Board} puzzle={ @puzzle } id="game" />
     </section>
     """
+  end
+
+  def handle_info({:flash, type, message}, socket) do
+    {:noreply, put_flash(socket, type, message)}
+  end
+
+  def handle_info(:redirect, socket) do
+    {:noreply,
+     Phoenix.LiveView.redirect(socket, to: ~p"/play")
+     |> put_flash(:info, "Congratulations! You solved the puzzle!")}
   end
 
   def help(assigns) do
